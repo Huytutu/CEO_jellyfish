@@ -9,6 +9,7 @@ const sketch4 = (p) => {
   let jellyfishes = [];
   let bigjellyfishes = [];
   let wishes = [];
+  let giantCenterJellyfish = null;
   
   // Title animation variables
   let titleStartTime = 0;
@@ -53,6 +54,9 @@ const sketch4 = (p) => {
       bigjellyfishes.push(new BigJellyFish(p.random(w), p.random(h)));
     }
 
+    // Create giant stationary jellyfish at center
+    giantCenterJellyfish = new GiantStationary(w / 2, h / 2);
+
     nextBubbleTime = p.millis() + p.random(300, 3000);
   };
 
@@ -81,6 +85,11 @@ const sketch4 = (p) => {
       b.display();
     }
 
+    // Display giant stationary jellyfish
+    if (giantCenterJellyfish) {
+      giantCenterJellyfish.display();
+    }
+
     // Update and display wishes
     for (let i = wishes.length - 1; i >= 0; i--) {
       wishes[i].update();
@@ -95,7 +104,7 @@ const sketch4 = (p) => {
 
     const maxWidth = 600;
 
-    const title = "CLB UETLC xin chúc\ncác bạn nữ CEO có một ngày 20/10 tuyệt vời";
+    const title = "CLB UETLC xin chúc\ncác bạn nữ CEO ngày 20/10 tuyệt vời";
     const description = ``;
 
     const titleSize = 50;
@@ -156,8 +165,16 @@ const sketch4 = (p) => {
     p.resizeCanvas(w, h);
   };
 
-  // Handle click on big jellyfish
+  // Handle click on jellyfish
   p.mousePressed = () => {
+    // Check giant jellyfish at center
+    if (giantCenterJellyfish && giantCenterJellyfish.isClicked(p.mouseX, p.mouseY)) {
+      const randomWish = wishPhrases[p.floor(p.random(wishPhrases.length))];
+      wishes.push(new Wish(giantCenterJellyfish.x, giantCenterJellyfish.y, randomWish, giantCenterJellyfish));
+      return false;
+    }
+    
+    // Check big jellyfish
     for (let b of bigjellyfishes) {
       // Check if click is within jellyfish radius
       const distance = p.dist(p.mouseX, p.mouseY, b.x, b.y);
@@ -450,6 +467,117 @@ class BigJellyFish extends Jellyfish {
   }
 }
 
+  // Giant Stationary Jellyfish class (center, no movement)
+  class GiantStationary {
+    constructor(x, y) {
+      this.x = x;
+      this.y = y;
+      this.size = 300; // Very large
+      this.offset = p.random(p.TWO_PI);
+      this.alpha = 200;
+    }
+    
+    isClicked(mouseX, mouseY) {
+      // Check if click is within jellyfish radius
+      const distance = p.dist(mouseX, mouseY, this.x, this.y);
+      return distance < this.size / 2;
+    }
+    
+    display() {
+      p.noStroke();
+      
+      // Glow layers (half circle)
+      for (let i = 15; i > 0; i--) {
+        p.fill(255, 180, 220, (this.alpha / i) * 0.15);
+        p.arc(this.x, this.y, this.size + i * 6, this.size + i * 6, p.PI, p.TWO_PI);
+      }
+      
+      // Main bell head (half circle)
+      p.fill(255, 200, 230, this.alpha);
+      p.arc(this.x, this.y, this.size, this.size, p.PI, p.TWO_PI);
+
+      // Wavy divide line at the bottom (diameter) with glow
+      const waveSegments = 30;
+      const radius = this.size / 2 - 15;
+      
+      // Glow layers for wavy line
+      for (let g = 10; g > 0; g--) {
+        p.stroke(255, 200, 230, (this.alpha / g) * 0.12);
+        p.strokeWeight(25 + g * 8);
+        p.noFill();
+        p.beginShape();
+        
+        for (let i = 0; i <= waveSegments; i++) {
+          const progress = i / waveSegments;
+          const x = this.x - radius + progress * (radius * 2);
+          const waveAmount = p.sin(p.frameCount * 0.08 + i * 0.2 + this.offset) * 6;
+          const y = this.y + waveAmount;
+          p.vertex(x, y);
+        }
+        p.endShape();
+      }
+      
+      // Main wavy line
+      p.stroke(255, 200, 230, this.alpha * 0.9);
+      p.strokeWeight(25);
+      p.noFill();
+      p.beginShape();
+      
+      for (let i = 0; i <= waveSegments; i++) {
+        const progress = i / waveSegments;
+        const x = this.x - radius + progress * (radius * 2);
+        const waveAmount = p.sin(p.frameCount * 0.08 + i * 0.2 + this.offset) * 6;
+        const y = this.y + waveAmount;
+        p.vertex(x, y);
+      }
+      p.endShape();
+
+      // Animated tentacles - first set (left side)
+      p.stroke(255, 200, 230, this.alpha * 0.6);
+      p.strokeWeight(5);
+      p.noFill();
+      p.beginShape();
+      for (let i = 0; i < 12; i++) {
+        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 8;
+        p.vertex(this.x + xOff + i * 8 - 30, this.y - 150 + this.size / 2 + i * 20);
+      }
+      p.endShape();
+
+      // Animated tentacles - second set (right side)
+      p.stroke(255, 200, 230, this.alpha * 0.6);
+      p.strokeWeight(5);
+      p.noFill();
+      p.beginShape();
+      for (let i = 0; i < 12; i++) {
+        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 8;
+        p.vertex(this.x + xOff + i * 8 + 30, this.y - 150 + this.size / 2 + i * 20);
+      }
+      p.endShape();
+
+      // Animated tentacles - third set (far left)
+      p.stroke(255, 200, 230, this.alpha * 0.6);
+      p.strokeWeight(5);
+      p.noFill();
+      p.beginShape();
+      for (let i = 0; i < 12; i++) {
+        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 8;
+        p.vertex(this.x + xOff - i * 8 - 60, this.y - 150 + this.size / 2 + i * 20);
+      }
+      p.endShape();
+
+      // Animated tentacles - fourth set (far right)
+      p.stroke(255, 200, 230, this.alpha * 0.6);
+      p.strokeWeight(5);
+      p.noFill();
+      p.beginShape();
+      for (let i = 0; i < 12; i++) {
+        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 8;
+        p.vertex(this.x + xOff - i * 8 + 60, this.y - 150 + this.size / 2 + i * 20);
+      }
+      p.endShape();
+    }
+  }
+
   // Wish class for floating text
   class Wish {
     constructor(x, y, text, jellyfish) {
@@ -458,7 +586,8 @@ class BigJellyFish extends Jellyfish {
       this.offsetY = 0;          // Start above jellyfish
       this.text = text;
       this.alpha = 255;
-      this.velocityY = -0.6;       // Slow upward float relative to jellyfish
+      // Fast velocity for giant jellyfish, slow for others
+      this.velocityY = (jellyfish instanceof GiantStationary) ? -2 : -1;
       this.size = p.random(24, 48);
       this.lifespan = 400;         // Total frames to live
       this.age = 0;
