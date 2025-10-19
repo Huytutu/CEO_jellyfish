@@ -13,6 +13,14 @@ const sketch4 = (p) => {
   
   // Title animation variables
   let titleStartTime = 0;
+  let lcxceoImage = null;
+
+  p.preload = () => {
+    lcxceoImage = p.loadImage('assets/lcxceo.png', 
+      () => {}, 
+      () => console.log('Image could not be loaded')
+    );
+  };
 
   // Wish phrases
   const wishPhrases = [
@@ -54,7 +62,6 @@ const sketch4 = (p) => {
       bigjellyfishes.push(new BigJellyFish(p.random(w), p.random(h)));
     }
 
-    // Create giant stationary jellyfish at center
     giantCenterJellyfish = new GiantStationary(w / 2, h / 2);
 
     nextBubbleTime = p.millis() + p.random(300, 3000);
@@ -85,12 +92,10 @@ const sketch4 = (p) => {
       b.display();
     }
 
-    // Display giant stationary jellyfish
     if (giantCenterJellyfish) {
       giantCenterJellyfish.display();
     }
 
-    // Update and display wishes
     for (let i = wishes.length - 1; i >= 0; i--) {
       wishes[i].update();
       wishes[i].display();
@@ -140,6 +145,21 @@ const sketch4 = (p) => {
     p.translate(p.width / 2, titleY);
     p.text(title, 0, 0);
     p.pop();
+
+    // Display image with title
+    if (lcxceoImage) {
+      let imageAlpha = p.lerp(255, 0, fadeProgress);
+      let imageScale = p.lerp(0.5, 2, easeProgress);
+      
+      p.push();
+      p.translate(p.width / 2, titleY + 150);
+      p.scale(imageScale);
+      p.tint(255, imageAlpha);
+      let imgWidth = 120;
+      let imgHeight = (imgWidth / lcxceoImage.width) * lcxceoImage.height;
+      p.image(lcxceoImage, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
+      p.pop();
+    }
 
     const descSize = 20;
     p.textSize(descSize);
