@@ -50,7 +50,7 @@ const sketch4 = (p) => {
       particles.push(new Particle());
     }
 
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 20; i++) {
       fireflies.push(new Firefly(p.random(2, 1)));
     }
 
