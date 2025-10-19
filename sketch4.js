@@ -113,7 +113,7 @@ const sketch4 = (p) => {
     const description = ``;
 
     // Responsive title size based on screen width
-    const titleSize = p.width < 768 ? p.width * 0.08 : 50;
+    const titleSize = p.width < 768 ? p.width * 0.06 : 60;
     const centerY = p.height / 2;
     const titlePopDuration = 3000; // Pop up animation duration
     const titleFadeDuration = 1500; // Fade out animation duration
@@ -153,10 +153,10 @@ const sketch4 = (p) => {
       let imageScale = p.lerp(0.5, 1, easeProgress);
       
       // Responsive image width based on screen size
-      let imgWidth = p.width < 768 ? p.width * 0.25 : 120;
+      let imgWidth = p.width < 768 ? p.width * 0.12 : 120;
       
       p.push();
-      p.translate(p.width / 2, titleY + (p.width < 768 ? 100 : 150));
+      p.translate(p.width / 2, titleY + (p.width < 768 ? 80 : 150));
       p.scale(imageScale);
       p.tint(255, imageAlpha);
       let imgHeight = (imgWidth / lcxceoImage.width) * lcxceoImage.height;
@@ -342,7 +342,9 @@ const sketch4 = (p) => {
     constructor(x, y) {
       this.x = x;
       this.y = y;
-      this.size = p.random(20, 40);
+      // Scale jellyfish down on mobile (50% smaller on phones)
+      const sizeMultiplier = p.width < 768 ? 0.5 : 1;
+      this.size = p.random(20, 40) * sizeMultiplier;
       this.speed = p.random(0.3, 1);
       this.offset = p.random(p.TWO_PI);
       this.alpha = p.random(40, 40);
@@ -388,13 +390,14 @@ const sketch4 = (p) => {
       p.endShape();
 
       // Animated tentacles
+      const tentacleScale = p.width < 768 ? 0.5 : 1;
       p.stroke(255, 200, 230, this.alpha * 0.6);
-      p.strokeWeight(3);
+      p.strokeWeight(3 * tentacleScale);
       p.noFill();
       p.beginShape();
       for (let i = 0; i < 5; i++) {
-        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 4;
-        p.vertex(this.x + xOff + i * 5 - 10 + 10, this.y - 15 + this.size / 2 + i * 10);
+        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 4 * tentacleScale;
+        p.vertex(this.x + xOff + i * 5 * tentacleScale - 10 * tentacleScale + 10 * tentacleScale, this.y - 15 * tentacleScale + this.size / 2 + i * 10 * tentacleScale);
       }
       p.endShape();
     }
@@ -404,7 +407,9 @@ class BigJellyFish extends Jellyfish {
   constructor(x, y) {
     super(x, y);
     
-    this.size = p.random(120, 200);
+    // Scale big jellyfish down on mobile (50% smaller on phones)
+    const sizeMultiplier = p.width < 768 ? 0.5 : 1;
+    this.size = p.random(120, 200) * sizeMultiplier;
     this.speed = p.random(0.5, 2.5);
     this.alpha = p.random(200,200)
   }
@@ -441,46 +446,47 @@ class BigJellyFish extends Jellyfish {
       p.endShape();
 
       // Animated tentacles - first set (left side)
+      const tentacleScale = p.width < 768 ? 0.5 : 1;
       p.stroke(255, 200, 230, this.alpha * 0.6);
-      p.strokeWeight(3);
+      p.strokeWeight(3 * tentacleScale);
       p.noFill();
       p.beginShape();
       for (let i = 0; i < 8; i++) {
-        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 5;
-        p.vertex(this.x + xOff + i * 5 - 10, this.y - 80 + this.size / 2 + i * 15);
+        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 5 * tentacleScale;
+        p.vertex(this.x + xOff + i * 5 * tentacleScale - 10 * tentacleScale, this.y - 80 * tentacleScale + this.size / 2 + i * 15 * tentacleScale);
       }
       p.endShape();
 
       // Animated tentacles - second set (right side)
       p.stroke(255, 200, 230, this.alpha * 0.6);
-      p.strokeWeight(3);
+      p.strokeWeight(3 * tentacleScale);
       p.noFill();
       p.beginShape();
       for (let i = 0; i < 8; i++) {
-        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 5;
-        p.vertex(this.x + xOff + i * 5 + 10, this.y - 80 + this.size / 2 + i * 15);
+        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 5 * tentacleScale;
+        p.vertex(this.x + xOff + i * 5 * tentacleScale + 10 * tentacleScale, this.y - 80 * tentacleScale + this.size / 2 + i * 15 * tentacleScale);
       }
       p.endShape();
 
       // Animated tentacles - third set (far left)
       p.stroke(255, 200, 230, this.alpha * 0.6);
-      p.strokeWeight(3);
+      p.strokeWeight(3 * tentacleScale);
       p.noFill();
       p.beginShape();
       for (let i = 0; i < 8; i++) {
-        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 5;
-        p.vertex(this.x + xOff - i * 5 - 20, this.y - 80 + this.size / 2 + i * 15);
+        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 5 * tentacleScale;
+        p.vertex(this.x + xOff - i * 5 * tentacleScale - 20 * tentacleScale, this.y - 80 * tentacleScale + this.size / 2 + i * 15 * tentacleScale);
       }
       p.endShape();
 
       // Animated tentacles - fourth set (far right)
       p.stroke(255, 200, 230, this.alpha * 0.6);
-      p.strokeWeight(3);
+      p.strokeWeight(3 * tentacleScale);
       p.noFill();
       p.beginShape();
       for (let i = 0; i < 8; i++) {
-        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 5;
-        p.vertex(this.x + xOff - i * 5 + 20, this.y - 80 + this.size / 2 + i * 15);
+        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 5 * tentacleScale;
+        p.vertex(this.x + xOff - i * 5 * tentacleScale + 20 * tentacleScale, this.y - 80 * tentacleScale + this.size / 2 + i * 15 * tentacleScale);
       }
       p.endShape();
     }
@@ -495,7 +501,9 @@ class BigJellyFish extends Jellyfish {
     constructor(x, y) {
       this.x = x;
       this.y = y;
-      this.size = 300; // Very large
+      // Scale giant jellyfish down on mobile (60% smaller on phones)
+      const sizeMultiplier = p.width < 768 ? 0.4 : 1;
+      this.size = 300 * sizeMultiplier; // Very large
       this.offset = p.random(p.TWO_PI);
       this.alpha = 200;
     }
@@ -556,46 +564,47 @@ class BigJellyFish extends Jellyfish {
       p.endShape();
 
       // Animated tentacles - first set (left side)
+      const tentacleScale = p.width < 768 ? 0.5 : 1;
       p.stroke(255, 200, 230, this.alpha * 0.6);
-      p.strokeWeight(5);
+      p.strokeWeight(5 * tentacleScale);
       p.noFill();
       p.beginShape();
       for (let i = 0; i < 12; i++) {
-        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 8;
-        p.vertex(this.x + xOff + i * 8 - 30, this.y - 150 + this.size / 2 + i * 20);
+        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 8 * tentacleScale;
+        p.vertex(this.x + xOff + i * 8 * tentacleScale - 30 * tentacleScale, this.y - 150 * tentacleScale + this.size / 2 + i * 20 * tentacleScale);
       }
       p.endShape();
 
       // Animated tentacles - second set (right side)
       p.stroke(255, 200, 230, this.alpha * 0.6);
-      p.strokeWeight(5);
+      p.strokeWeight(5 * tentacleScale);
       p.noFill();
       p.beginShape();
       for (let i = 0; i < 12; i++) {
-        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 8;
-        p.vertex(this.x + xOff + i * 8 + 30, this.y - 150 + this.size / 2 + i * 20);
+        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 8 * tentacleScale;
+        p.vertex(this.x + xOff + i * 8 * tentacleScale + 30 * tentacleScale, this.y - 150 * tentacleScale + this.size / 2 + i * 20 * tentacleScale);
       }
       p.endShape();
 
       // Animated tentacles - third set (far left)
       p.stroke(255, 200, 230, this.alpha * 0.6);
-      p.strokeWeight(5);
+      p.strokeWeight(5 * tentacleScale);
       p.noFill();
       p.beginShape();
       for (let i = 0; i < 12; i++) {
-        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 8;
-        p.vertex(this.x + xOff - i * 8 - 60, this.y - 150 + this.size / 2 + i * 20);
+        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 8 * tentacleScale;
+        p.vertex(this.x + xOff - i * 8 * tentacleScale - 60 * tentacleScale, this.y - 150 * tentacleScale + this.size / 2 + i * 20 * tentacleScale);
       }
       p.endShape();
 
       // Animated tentacles - fourth set (far right)
       p.stroke(255, 200, 230, this.alpha * 0.6);
-      p.strokeWeight(5);
+      p.strokeWeight(5 * tentacleScale);
       p.noFill();
       p.beginShape();
       for (let i = 0; i < 12; i++) {
-        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 8;
-        p.vertex(this.x + xOff - i * 8 + 60, this.y - 150 + this.size / 2 + i * 20);
+        let xOff = p.sin(p.frameCount * 0.1 + i + this.offset) * 8 * tentacleScale;
+        p.vertex(this.x + xOff - i * 8 * tentacleScale + 60 * tentacleScale, this.y - 150 * tentacleScale + this.size / 2 + i * 20 * tentacleScale);
       }
       p.endShape();
     }
@@ -611,7 +620,9 @@ class BigJellyFish extends Jellyfish {
       this.alpha = 255;
       // Fast velocity for giant jellyfish, slow for others
       this.velocityY = (jellyfish instanceof GiantStationary) ? -2 : -1;
-      this.size = p.random(24, 48);
+      // Smaller text on mobile, normal on desktop
+      const sizeMultiplier = p.width < 768 ? 0.5 : 1;
+      this.size = p.random(24, 48) * sizeMultiplier;
       this.lifespan = 400;         // Total frames to live
       this.age = 0;
     }
