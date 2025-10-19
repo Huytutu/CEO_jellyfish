@@ -112,7 +112,8 @@ const sketch4 = (p) => {
     const title = "CLB UETLC xin chúc\ncác bạn nữ CEO ngày 20/10 tuyệt vời";
     const description = ``;
 
-    const titleSize = 50;
+    // Responsive title size based on screen width
+    const titleSize = p.width < 768 ? p.width * 0.08 : 50;
     const centerY = p.height / 2;
     const titlePopDuration = 3000; // Pop up animation duration
     const titleFadeDuration = 1500; // Fade out animation duration
@@ -149,13 +150,15 @@ const sketch4 = (p) => {
     // Display image with title
     if (lcxceoImage) {
       let imageAlpha = p.lerp(255, 0, fadeProgress);
-      let imageScale = p.lerp(0.5, 2, easeProgress);
+      let imageScale = p.lerp(0.5, 1, easeProgress);
+      
+      // Responsive image width based on screen size
+      let imgWidth = p.width < 768 ? p.width * 0.25 : 120;
       
       p.push();
-      p.translate(p.width / 2, titleY + 150);
+      p.translate(p.width / 2, titleY + (p.width < 768 ? 100 : 150));
       p.scale(imageScale);
       p.tint(255, imageAlpha);
-      let imgWidth = 120;
       let imgHeight = (imgWidth / lcxceoImage.width) * lcxceoImage.height;
       p.image(lcxceoImage, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
       p.pop();

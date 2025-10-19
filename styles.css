@@ -45,6 +45,12 @@ canvas {
   transform: none;
 }
 
+@media (max-width: 768px) {
+  #depth-wrapper {
+    display: none;
+  }
+}
+
 .depth-label {
   transform-origin: center right;
   transform: rotate(-90deg);
@@ -78,6 +84,12 @@ canvas {
   background-size: 50px 2px, 2px 50px;
 }
 
+@media (max-width: 768px) {
+  .viewfinder-corners::before {
+    display: none;
+  }
+}
+
 .dot-nav {
   position: fixed;
   left: 44px;
@@ -87,6 +99,13 @@ canvas {
   flex-direction: column;
   gap: 33px;
   z-index: 10000;
+}
+
+@media (max-width: 768px) {
+  .dot-nav {
+    left: 20px;
+    gap: 20px;
+  }
 }
 
 .dot {
@@ -99,6 +118,14 @@ canvas {
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
+}
+
+@media (max-width: 768px) {
+  .dot {
+    width: 10px;
+    height: 10px;
+    border: 1.5px solid white;
+  }
 }
 
 .dot.active {
@@ -121,6 +148,12 @@ canvas {
   transition: opacity 0.3s ease;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+}
+
+@media (max-width: 768px) {
+  .tooltip {
+    display: none;
+  }
 }
 
 .tooltip.visible {
