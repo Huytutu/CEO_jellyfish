@@ -87,3 +87,35 @@ window.addEventListener('load', () => {
     depthLabel.textContent = depthTexts[0];
   }
 });
+
+// Handle name input modal
+const nameModal = document.getElementById('nameModal');
+const nameInput = document.getElementById('nameInput');
+const nameSubmit = document.getElementById('nameSubmit');
+
+nameSubmit.addEventListener('click', submitName);
+nameInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    submitName();
+  }
+});
+
+function submitName() {
+  const name = nameInput.value.trim();
+  if (name.length > 0) {
+    // Pass name to p5.js sketch
+    window.receiverName = name;
+    window.animationStarted = true;
+    
+    // Hide modal
+    nameModal.classList.add('hidden');
+  } else {
+    nameInput.focus();
+  }
+}
+
+// Focus input on load
+window.addEventListener('load', () => {
+  nameInput.focus();
+});
+

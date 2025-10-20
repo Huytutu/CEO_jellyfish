@@ -10,10 +10,13 @@ const sketch4 = (p) => {
   let bigjellyfishes = [];
   let wishes = [];
   let giantCenterJellyfish = null;
+  let bloomJellyfishes = [];
+  let bloomActive = false;
   
   // Title animation variables
   let titleStartTime = 0;
   let lcxceoImage = null;
+  let animationStarted = false; // Track if animation should start
 
   p.preload = () => {
     lcxceoImage = p.loadImage('assets/lcxceo.png', 
@@ -23,20 +26,29 @@ const sketch4 = (p) => {
   };
 
   // Wish phrases
-const wishPhrases = [
-  "Xinh rồi thì đừng buồn nha,\n20/10 phải cười thiệt tươi 💕",
-  "20/10 xinh đỉnh 8386,\nmãi top luôn 😎",
-  "20/10 lấp lánh\nnhư tinh tú giữa trời ✨",
-  "Xinh gái trầm ai chính,\nmãi đỉnh mãi đỉnh 💖",
-  "20/10 xinh như hoa,\ntiền vô như nước 💸🌸",
-  "Chúc người đẹp có tất cả,\ntrừ vất vả 💕",
-  "Chúc gái thật vui vẻ,\nluôn nở nụ cười trên môi 😆",
-  "20/10 chỉ được cười,\nkhông được rơi nước mắt nha 💧",
-  "Chúc gái ngày 20/10 thật ý nghĩa,\nkhóc ít và niềm vui nhân đôi 💫",
-  "Vạn sự như ý,\ntỷ sự như mơ,\ntriệu sự bất ngờ và hạnh phúc 💐",
-  "20/10 xinh gái vượt mức cho phép 💅\nĐẹp hết nấc luôn!",
-  "20/10 vui nhé cô gái xinh đẹp 💖\nLuôn rạng rỡ và hạnh phúc!"
+const wishTemplates = [
+  "{name} ơi, xinh rồi thì đừng buồn nha\n20/10 phải cười thiệt tươi 💕",
+  "20/10 xinh đỉnh 8386\n{name} mãi top luôn 😎",
+  "20/10 của {name}\nlấp lánh như tinh tú giữa trời ✨",
+  "Xinh gái trầm ai chính\n{name} mãi đỉnh mãi đỉnh 💖",
+  "{name} ơi, 20/10 xinh như hoa\nTiền vô như nước luôn nha",
+  "Chúc {name} có tất cả\nNgoại trừ vất vả",
+  "20/10 này {name}\nHãy vui và cười thật tươi 😆",
+  "{name}, ngày hôm nay chỉ được cười\nKhông được rơi nước mắt nha",
+  "Chúc {name} 20/10 thật ý nghĩa\nKhóc ít thôi và niềm vui nhân đôi",
+  "{name} ơi, vạn sự như ý\nTỷ sự như mơ và hạnh phúc",
+  "20/10 này {name}\nXinh gái vượt mức cho phép",
+  "20/10 vui nhé {name} xinh đẹp\nLuôn rạng rỡ và hạnh phúc!",
+  "Đám cưới vui vẻ =))"
 ];
+
+function buildWishMessage() {
+  const rawName = (window.receiverName && window.receiverName.trim()) || "bạn";
+  const name = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+  const index = p.floor(p.random(wishTemplates.length));
+  const template = wishTemplates[index];
+  return template.replace(/\{name\}/g, name);
+}
 
 
   p.setup = () => {
@@ -72,6 +84,16 @@ const wishPhrases = [
     nextBubbleTime = p.millis() + p.random(300, 3000);
   };
 
+  function triggerBloom(centerX, centerY) {
+    bloomJellyfishes = [];
+    const bloomCount = 22;
+    const now = p.millis();
+    for (let i = 0; i < bloomCount; i++) {
+      bloomJellyfishes.push(new BloomJellyfish(centerX, centerY, now + i * 35));
+    }
+    bloomActive = true;
+  }
+
   p.draw = () => {
     setGradientBackground();
 
@@ -85,6 +107,22 @@ const wishPhrases = [
     for (let ff of fireflies) {
       ff.update();
       ff.show();
+    }
+
+    if (bloomActive) {
+      const currentTime = p.millis();
+      for (let i = bloomJellyfishes.length - 1; i >= 0; i--) {
+        const bloom = bloomJellyfishes[i];
+        bloom.update(currentTime);
+        bloom.display();
+        if (bloom.done) {
+          bloomJellyfishes.splice(i, 1);
+        }
+      }
+
+      if (bloomJellyfishes.length === 0) {
+        bloomActive = false;
+      }
     }
 
     for (let j of jellyfishes) {
@@ -114,8 +152,19 @@ const wishPhrases = [
 
     const maxWidth = 600;
 
-    const title = "CLB UETLC xin chúc\ncác bạn nữ CEO ngày 20/10 tuyệt vời";
+    // Get receiver name from window object if available
+    const currentReceiverName = window.receiverName || "";
+    const title = currentReceiverName 
+      ? `CLB UETLC gửi lời chúc\n${currentReceiverName}\n20/10 thật rạng rỡ và hạnh phúc 💐`
+      : "CLB UETLC xin chúc\ncác bạn nữ CEO ngày 20/10 tuyệt vời";
     const description = ``;
+
+    // Check if animation should start
+    if (window.animationStarted && !animationStarted) {
+      animationStarted = true;
+      titleStartTime = p.millis();
+      triggerBloom(p.width / 2, p.height / 2);
+    }
 
     // Responsive title size based on screen width
     const titleSize = p.width < 768 ? p.width * 0.06 : 60;
@@ -123,67 +172,99 @@ const wishPhrases = [
     const titlePopDuration = 3000; // Pop up animation duration
     const titleFadeDuration = 1500; // Fade out animation duration
     
-    // Calculate animation progress (0 to 1)
-    let elapsedTime = p.millis() - titleStartTime;
-    let popProgress = p.constrain(elapsedTime / titlePopDuration, 0, 1);
-    let fadeProgress = p.constrain((elapsedTime - titlePopDuration) / titleFadeDuration, 0, 1);
-    
-    // Easing function for pop-up effect (ease-out)
-    let easeProgress = 1 - p.pow(1 - popProgress, 2);
-    
-    // Calculate Y position: stays at center
-    let titleY = centerY;
-    
-    // Calculate scale for pop effect (starts small, grows to normal)
-    let scale = p.lerp(0.5, 1, easeProgress);
-    
-    // Calculate alpha for fade out (1 at start, 0 at end)
-    let titleAlpha = p.lerp(255, 0, fadeProgress);
-    
-    p.textFont('Dancing Script');
-    p.fill(255, titleAlpha);
-    p.noStroke();
-    p.textAlign(p.CENTER, p.CENTER);
-    p.textSize(titleSize * scale);
-    p.textLeading(1 * titleSize * scale);
-    
-    p.push();
-    p.translate(p.width / 2, titleY);
-    p.text(title, 0, 0);
-    p.pop();
+    // Only show title animation if name has been submitted
+    if (animationStarted) {
+      // Calculate animation progress (0 to 1)
+      let elapsedTime = p.millis() - titleStartTime;
+      let popProgress = p.constrain(elapsedTime / titlePopDuration, 0, 1);
+      let fadeProgress = p.constrain((elapsedTime - titlePopDuration) / titleFadeDuration, 0, 1);
+      
+      // Easing function for pop-up effect (ease-out)
+      let easeProgress = 1 - p.pow(1 - popProgress, 2);
+      
+      // Calculate Y position: stays at center
+      let titleY = centerY;
+      
+      // Calculate scale for pop effect (starts small, grows to normal)
+      let scale = p.lerp(0.5, 1, easeProgress);
+      
+      // Calculate alpha for fade out (1 at start, 0 at end)
+      let titleAlpha = p.lerp(255, 0, fadeProgress);
+      
+      const hasName = currentReceiverName.length > 0;
 
-    // Display image with title
-    if (lcxceoImage) {
-      let imageAlpha = p.lerp(255, 0, fadeProgress);
-      let imageScale = p.lerp(0.5, 1, easeProgress);
-      
-      // Responsive image width based on screen size
-      let imgWidth = p.width < 768 ? p.width * 0.12 : 120;
-      
       p.push();
-      p.translate(p.width / 2, titleY + (p.width < 768 ? 80 : 150));
-      p.scale(imageScale);
-      p.tint(255, imageAlpha);
-      let imgHeight = (imgWidth / lcxceoImage.width) * lcxceoImage.height;
-      p.image(lcxceoImage, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
+      p.translate(p.width / 2, titleY);
+      p.textAlign(p.CENTER, p.CENTER);
+      p.noStroke();
+      p.textFont('Dancing Script');
+
+      if (hasName) {
+        const topLine = "CLB UETLC xin chúc";
+        const nameLine = currentReceiverName;
+        const bottomLine = "ngày 20/10 tuyệt vời";
+        const lineHeight = titleSize * scale * 1.2;
+
+        // Top line
+        p.textStyle(p.NORMAL);
+        p.fill(255, titleAlpha);
+        p.textSize(titleSize * scale);
+        p.text(topLine, 0, -lineHeight);
+
+        // Highlighted name line
+        p.textStyle(p.BOLD);
+        p.fill(239, 43, 79, titleAlpha);
+        p.textSize(titleSize * 1.28 * scale);
+        p.text(nameLine, 0, 0);
+
+        // Bottom line
+        p.textStyle(p.NORMAL);
+        p.fill(255, titleAlpha);
+        p.textSize(titleSize * scale);
+        p.text(bottomLine, 0, lineHeight);
+      } else {
+        // Fallback when name is not available
+        p.textStyle(p.NORMAL);
+        p.fill(255, titleAlpha);
+        p.textSize(titleSize * scale);
+        p.textLeading(1 * titleSize * scale);
+        p.text(title, 0, 0);
+      }
       p.pop();
+
+      // Display image with title
+      if (lcxceoImage) {
+        let imageAlpha = p.lerp(255, 0, fadeProgress);
+        let imageScale = p.lerp(0.5, 1, easeProgress);
+        
+        // Responsive image width based on screen size
+        let imgWidth = p.width < 768 ? p.width * 0.12 : 120;
+        
+        p.push();
+        p.translate(p.width / 2, titleY + (p.width < 768 ? 80 : 150));
+        p.scale(imageScale);
+        p.tint(255, imageAlpha);
+        let imgHeight = (imgWidth / lcxceoImage.width) * lcxceoImage.height;
+        p.image(lcxceoImage, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
+        p.pop();
+      }
+
+      const descSize = 20;
+      p.textSize(descSize);
+      p.textLeading(1.4 * descSize);
+
+      const descMaxWidth = maxWidth;
+
+      const approxLines = 7;
+      const lineHeight = 1.4 * descSize;
+      const descHeight = approxLines * lineHeight;
+
+      const descX = p.width - 200 - descMaxWidth;
+      const descY = p.height - 200 - descHeight;
+
+      p.textAlign(p.LEFT, p.TOP);
+      p.text(description, descX, descY, descMaxWidth);
     }
-
-    const descSize = 20;
-    p.textSize(descSize);
-    p.textLeading(1.4 * descSize);
-
-    const descMaxWidth = maxWidth;
-
-    const approxLines = 7;
-    const lineHeight = 1.4 * descSize;
-    const descHeight = approxLines * lineHeight;
-
-    const descX = p.width - 200 - descMaxWidth;
-    const descY = p.height - 200 - descHeight;
-
-    p.textAlign(p.LEFT, p.TOP);
-    p.text(description, descX, descY, descMaxWidth);
   };
 
   p.windowResized = () => {
@@ -197,7 +278,7 @@ const wishPhrases = [
   p.mousePressed = () => {
     // Check giant jellyfish at center
     if (giantCenterJellyfish && giantCenterJellyfish.isClicked(p.mouseX, p.mouseY)) {
-      const randomWish = wishPhrases[p.floor(p.random(wishPhrases.length))];
+      const randomWish = buildWishMessage();
       wishes.push(new Wish(giantCenterJellyfish.x, giantCenterJellyfish.y, randomWish, giantCenterJellyfish));
       return false;
     }
@@ -208,8 +289,8 @@ const wishPhrases = [
       const distance = p.dist(p.mouseX, p.mouseY, b.x, b.y);
       if (distance < b.size) {
         // Create wish phrase at jellyfish position
-        const randomWish = wishPhrases[p.floor(p.random(wishPhrases.length))];
-        wishes.push(new Wish(b.x, b.y, randomWish, b));  // Pass jellyfish reference
+  const randomWish = buildWishMessage();
+  wishes.push(new Wish(b.x, b.y, randomWish, b));  // Pass jellyfish reference
         return false; // Prevent default
       }
     }
@@ -222,7 +303,7 @@ const wishPhrases = [
       
       // Check giant jellyfish at center
       if (giantCenterJellyfish && giantCenterJellyfish.isClicked(touchX, touchY)) {
-        const randomWish = wishPhrases[p.floor(p.random(wishPhrases.length))];
+        const randomWish = buildWishMessage();
         wishes.push(new Wish(giantCenterJellyfish.x, giantCenterJellyfish.y, randomWish, giantCenterJellyfish));
         return false;
       }
@@ -231,7 +312,7 @@ const wishPhrases = [
       for (let b of bigjellyfishes) {
         const distance = p.dist(touchX, touchY, b.x, b.y);
         if (distance < b.size) {
-          const randomWish = wishPhrases[p.floor(p.random(wishPhrases.length))];
+          const randomWish = buildWishMessage();
           wishes.push(new Wish(b.x, b.y, randomWish, b));
           return false;
         }
@@ -365,6 +446,84 @@ const wishPhrases = [
       p.noStroke();
       p.fill(255, 255, 255, this.alpha);
       p.circle(this.pos.x, this.pos.y, this.size);
+    }
+  }
+
+  class BloomJellyfish {
+    constructor(centerX, centerY, startTime) {
+      this.cx = centerX;
+      this.cy = centerY;
+      this.startTime = startTime;
+      this.duration = p.random(1100, 1700);
+      this.angle = p.random(p.TWO_PI);
+      const maxDimension = Math.min(p.width, p.height);
+      this.maxDistance = p.random(maxDimension * 0.18, maxDimension * 0.38);
+      this.baseSize = p.random(45, 85);
+      this.visible = false;
+      this.done = false;
+      this.progress = 0;
+      this.x = centerX;
+      this.y = centerY;
+    }
+
+    update(currentTime) {
+      const elapsed = currentTime - this.startTime;
+      if (elapsed < 0) {
+        this.visible = false;
+        return;
+      }
+
+      this.visible = true;
+      this.progress = p.constrain(elapsed / this.duration, 0, 1);
+
+      const ease = 1 - p.pow(1 - this.progress, 3);
+      this.x = this.cx + p.cos(this.angle) * this.maxDistance * ease;
+      this.y = this.cy + p.sin(this.angle) * this.maxDistance * ease;
+
+      const mobileScale = p.width < 768 ? 0.55 : 1;
+      this.size = this.baseSize * (0.6 + ease * 0.8) * mobileScale;
+      this.tentacleLength = this.baseSize * (0.8 + ease * 0.6) * mobileScale;
+      this.alpha = p.lerp(255, 0, this.progress);
+
+      if (this.progress >= 1) {
+        this.done = true;
+      }
+    }
+
+    display() {
+      if (!this.visible || this.done) {
+        return;
+      }
+
+      p.push();
+      p.translate(this.x, this.y);
+
+      const glowLayers = 6;
+      for (let i = glowLayers; i > 0; i--) {
+        p.fill(255, 200, 230, (this.alpha / glowLayers) * i * 0.35);
+        p.arc(0, 0, this.size + i * 12, this.size + i * 12, p.PI, p.TWO_PI);
+      }
+
+      p.fill(255, 200, 230, this.alpha);
+      p.arc(0, 0, this.size, this.size, p.PI, p.TWO_PI);
+
+      p.stroke(255, 200, 230, this.alpha * 0.6);
+      p.strokeWeight(2);
+      p.noFill();
+      const tentacleCount = 5;
+      const segments = 6;
+      for (let t = 0; t < tentacleCount; t++) {
+        const offsetX = (t - (tentacleCount - 1) / 2) * (this.size * 0.18);
+        p.beginShape();
+        for (let seg = 0; seg < segments; seg++) {
+          const wave = p.sin(this.progress * p.TWO_PI * 1.5 + seg * 0.7 + t) * 4 * (1 - this.progress * 0.5);
+          const y = this.size / 2 + seg * (this.tentacleLength / segments);
+          p.vertex(offsetX + wave, y);
+        }
+        p.endShape();
+      }
+
+      p.pop();
     }
   }
 
