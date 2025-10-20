@@ -23,16 +23,21 @@ const sketch4 = (p) => {
   };
 
   // Wish phrases
-  const wishPhrases = [
-    "Happy 20/10 💕",
-    "Chúc mừng ngày 20/10 ✨",
-    "Yêu thương ❤️",
-    "Mạnh mẽ và xinh đẹp 🌸",
-    "Luôn hạnh phúc 😊",
-    "Sức khỏe và thành công 🌟",
-    "Nụ cười tỏa sáng ✨",
-    "Tự tin và tươi sáng 🌈"
-  ];
+const wishPhrases = [
+  "Xinh rồi thì đừng buồn nha,\n20/10 phải cười thiệt tươi 💕",
+  "20/10 xinh đỉnh 8386,\nmãi top luôn 😎",
+  "20/10 lấp lánh\nnhư tinh tú giữa trời ✨",
+  "Xinh gái trầm ai chính,\nmãi đỉnh mãi đỉnh 💖",
+  "20/10 xinh như hoa,\ntiền vô như nước 💸🌸",
+  "Chúc người đẹp có tất cả,\ntrừ vất vả 💕",
+  "Chúc gái thật vui vẻ,\nluôn nở nụ cười trên môi 😆",
+  "20/10 chỉ được cười,\nkhông được rơi nước mắt nha 💧",
+  "Chúc gái ngày 20/10 thật ý nghĩa,\nkhóc ít và niềm vui nhân đôi 💫",
+  "Vạn sự như ý,\ntỷ sự như mơ,\ntriệu sự bất ngờ và hạnh phúc 💐",
+  "20/10 xinh gái vượt mức cho phép 💅\nĐẹp hết nấc luôn!",
+  "20/10 vui nhé cô gái xinh đẹp 💖\nLuôn rạng rỡ và hạnh phúc!"
+];
+
 
   p.setup = () => {
     const parent = document.getElementById('section4');
@@ -210,6 +215,31 @@ const sketch4 = (p) => {
     }
   };
 
+  p.touchStarted = () => {
+    if (p.touches.length > 0) {
+      const touchX = p.touches[0].x;
+      const touchY = p.touches[0].y;
+      
+      // Check giant jellyfish at center
+      if (giantCenterJellyfish && giantCenterJellyfish.isClicked(touchX, touchY)) {
+        const randomWish = wishPhrases[p.floor(p.random(wishPhrases.length))];
+        wishes.push(new Wish(giantCenterJellyfish.x, giantCenterJellyfish.y, randomWish, giantCenterJellyfish));
+        return false;
+      }
+      
+      // Check big jellyfish
+      for (let b of bigjellyfishes) {
+        const distance = p.dist(touchX, touchY, b.x, b.y);
+        if (distance < b.size) {
+          const randomWish = wishPhrases[p.floor(p.random(wishPhrases.length))];
+          wishes.push(new Wish(b.x, b.y, randomWish, b));
+          return false;
+        }
+      }
+    }
+    return false;
+  };
+
   function setGradientBackground() {
     let ctx = p.drawingContext;
     let gradient = ctx.createLinearGradient(0, 0, 0, p.height);
@@ -364,7 +394,7 @@ const sketch4 = (p) => {
       // Glow layers (half circle)
       for (let i = 10; i > 0; i--) {
         p.fill(255, 180, 220, (this.alpha / i) * 0.2);
-        p.arc(this.x, this.y, this.size + i * 8, this.size + i * 8, p.PI, p.TWO_PI);
+        p.arc(this.x, this.y, this.size + i * 5, this.size + i * 5, p.PI, p.TWO_PI);
       }
       
       // Main bell head (half circle)
@@ -622,7 +652,7 @@ class BigJellyFish extends Jellyfish {
       this.velocityY = (jellyfish instanceof GiantStationary) ? -2 : -1;
       // Smaller text on mobile, normal on desktop
       const sizeMultiplier = p.width < 768 ? 0.5 : 1;
-      this.size = p.random(24, 48) * sizeMultiplier;
+      this.size = p.random(24, 36) * sizeMultiplier;
       this.lifespan = 400;         // Total frames to live
       this.age = 0;
     }
