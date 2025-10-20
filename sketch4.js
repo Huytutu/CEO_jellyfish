@@ -27,14 +27,14 @@ const sketch4 = (p) => {
 
   // Wish phrases
 const wishTemplates = [
-  "{name} ơi, xinh rồi thì đừng buồn nha\n20/10 phải cười thiệt tươi 💕",
+  "Yêu CEO nhiều lắm",
+  "I am waiting for new MV",
   "20/10 xinh đỉnh 8386\n{name} mãi top luôn 😎",
   "20/10 của {name}\nlấp lánh như tinh tú giữa trời ✨",
   "Xinh gái trầm ai chính\n{name} mãi đỉnh mãi đỉnh 💖",
   "{name} ơi, 20/10 xinh như hoa\nTiền vô như nước luôn nha",
   "Chúc {name} có tất cả\nNgoại trừ vất vả",
   "20/10 này {name}\nHãy vui và cười thật tươi 😆",
-  "{name}, ngày hôm nay chỉ được cười\nKhông được rơi nước mắt nha",
   "Chúc {name} 20/10 thật ý nghĩa\nKhóc ít thôi và niềm vui nhân đôi",
   "{name} ơi, vạn sự như ý\nTỷ sự như mơ và hạnh phúc",
   "20/10 này {name}\nXinh gái vượt mức cho phép",
@@ -289,14 +289,18 @@ function buildWishMessage() {
       const distance = p.dist(p.mouseX, p.mouseY, b.x, b.y);
       if (distance < b.size) {
         // Create wish phrase at jellyfish position
-  const randomWish = buildWishMessage();
-  wishes.push(new Wish(b.x, b.y, randomWish, b));  // Pass jellyfish reference
+        const randomWish = buildWishMessage();
+        wishes.push(new Wish(b.x, b.y, randomWish, b));  // Pass jellyfish reference
         return false; // Prevent default
       }
     }
   };
 
   p.touchStarted = () => {
+    if (!window.animationStarted) {
+      return true;
+    }
+
     if (p.touches.length > 0) {
       const touchX = p.touches[0].x;
       const touchY = p.touches[0].y;
@@ -318,7 +322,7 @@ function buildWishMessage() {
         }
       }
     }
-    return false;
+    return true;
   };
 
   function setGradientBackground() {
