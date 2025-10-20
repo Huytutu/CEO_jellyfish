@@ -11,12 +11,13 @@ A personalized, interactive celebratory web page featuring animated jellyfish, b
 - Smooth intro animation and interactive effects
 
 ## Project Structure
-```
-OCEAN/
+``` 
+    assets
     index.html
     script.js
     sketch4.js
     styles.css
+    README.md
 ```
 
 - `OCEAN/index.html`: Main celebratory page with modal and animation
