@@ -30,7 +30,7 @@ A personalized, interactive celebratory web page featuring animated jellyfish, b
    ```
    git clone https://github.com/Huytutu/CEO_jellyfish.git
    ```
-2. Open `OCEAN/index.html` in your browser.
+2. Open `index.html` in your browser.
 3. Enter the recipient's name in the modal to start the animation.
 
 ## Customization
